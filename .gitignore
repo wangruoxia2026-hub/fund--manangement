@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+fund_management.db
+uploads/
+.env
+.venv/
+*.log

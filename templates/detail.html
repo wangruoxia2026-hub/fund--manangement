@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基金详情 - 基金合同管理系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- 品牌 Logo -->
+        <div class="brand">
+            <div class="logo">💼</div>
+            <div class="name">
+                FundContract
+                <small>基金合同全生命周期管理平台</small>
+            </div>
+        </div>
+
+        <!-- 面包屑导航 -->
+        <div class="breadcrumb">
+            <a href="/">🏠 基金列表</a>
+            <span class="sep">/</span>
+            <span class="current" id="fundBreadcrumb">基金详情</span>
+        </div>
+
+        <!-- 基金基本信息卡片 -->
+        <div class="card" id="fundInfoCard">
+            <div class="card-title">
+                <div class="title-left">
+                    <span class="title-bar"></span>
+                    <span>基金信息</span>
+                </div>
+                <button class="btn btn-sm btn-default" onclick="showEditFundModal()">✏️ 编辑</button>
+            </div>
+            <div class="info-grid" id="fundInfoGrid">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 节点列表卡片 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="title-left">
+                    <span class="title-bar"></span>
+                    <span>节点列表</span>
+                </div>
+                <button class="btn btn-sm btn-gradient" onclick="showCreateNodeModal()">➕ 创建节点</button>
+            </div>
+            <div id="nodesContainer">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 新建/编辑基金模态框 -->
+    <div class="modal-overlay" id="fundModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="fundModalTitle">编辑基金</h2>
+                <button class="modal-close" onclick="closeFundModal()" aria-label="关闭">&times;</button>
+            </div>
+            <form id="fundForm">
+                <input type="hidden" id="fundId">
+                <div class="form-group">
+                    <label class="form-label">基金代码 <span class="req">*</span></label>
+                    <input type="text" id="fundCode" placeholder="请输入基金代码" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">基金名称 <span class="req">*</span></label>
+                    <input type="text" id="fundName" placeholder="请输入基金名称" required>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeFundModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveFund()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建节点模态框 -->
+    <div class="modal-overlay" id="nodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">创建节点</h2>
+                <button class="modal-close" onclick="closeNodeModal()" aria-label="关闭">&times;</button>
+            </div>
+            <form id="nodeForm">
+                <div class="form-group">
+                    <label class="form-label">节点类型 <span class="req">*</span></label>
+                    <select id="nodeType" required>
+                        <option value="">请选择节点类型</option>
+                        <option value="首次">首次</option>
+                        <option value="变更">变更</option>
+                        <option value="分红">分红</option>
+                        <option value="临开">临开</option>
+                        <option value="自定义">自定义</option>
+                    </select>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeNodeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveNode()">创建并上传文件</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 节点详情模态框 -->
+    <div class="modal-overlay" id="nodeDetailModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title" id="nodeDetailTitle">节点详情</h2>
+                <button class="modal-close" onclick="closeNodeDetailModal()" aria-label="关闭">&times;</button>
+            </div>
+            <div id="nodeDetailContent">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件上传模态框 -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">上传文件</h2>
+                <button class="modal-close" onclick="closeUploadModal()" aria-label="关闭">&times;</button>
+            </div>
+            <form id="uploadForm">
+                <input type="hidden" id="uploadNodeId">
+                <div class="form-group">
+                    <label class="form-label">选择文件 <span class="req">*</span></label>
+                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                    <small style="color:var(--text-3); font-size:12px; display:block; margin-top:6px;">支持 PDF、Word、图片格式</small>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeUploadModal()">取消</button>
+                <button class="btn btn-primary" onclick="doUpload()">上传</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提取信息模态框 -->
+    <div class="modal-overlay" id="extractionModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title" id="extractionModalTitle">提取信息</h2>
+                <button class="modal-close" onclick="closeExtractionModal()" aria-label="关闭">&times;</button>
+            </div>
+            <div id="extractionFormContainer">
+                <!-- 动态表单内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeExtractionModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveExtraction()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">⚠️ 确认删除</h2>
+                <button class="modal-close" onclick="closeDeleteModal()" aria-label="关闭">&times;</button>
+            </div>
+            <p id="deleteMessage" style="color:var(--text-2)">确定要删除吗？此操作不可恢复。</p>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        // 全局变量：当前基金ID
+        let currentFundId = null;
+
+        // 页面加载完成后获取基金ID并加载数据
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL获取基金ID
+            const pathParts = window.location.pathname.split('/');
+            currentFundId = pathParts[pathParts.length - 1];
+
+            if (currentFundId && !isNaN(currentFundId)) {
+                loadFundDetail(currentFundId);
+                loadNodes(currentFundId);
+            } else {
+                showToast('无效的基金ID', 'error');
+                setTimeout(() => window.location.href = '/', 1500);
+            }
+        });
+    </script>
+</body>
+</html>

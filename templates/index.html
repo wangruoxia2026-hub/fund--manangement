@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基金合同管理系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- 品牌 Logo -->
+        <div class="brand">
+            <div class="logo">💼</div>
+            <div class="name">
+                FundContract
+                <small>基金合同全生命周期管理平台</small>
+            </div>
+        </div>
+
+        <!-- 页面 Hero -->
+        <div class="page-header">
+            <h1>📁 基金合同管理系统</h1>
+            <p>统一管理基金档案、合同节点与关键信息提取，让合规更高效。</p>
+            <div class="header-stats" id="headerStats">
+                <div class="stat"><div class="n" id="statTotal">--</div><div class="l">基金总数</div></div>
+                <div class="stat"><div class="n" id="statToday">--</div><div class="l">新增基金</div></div>
+                <div class="stat"><div class="n" id="statNodes">--</div><div class="l">合同节点</div></div>
+                <div class="stat"><div class="n" id="statFiles">--</div><div class="l">合同文件</div></div>
+            </div>
+        </div>
+
+        <!-- 主内容卡片 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="title-left">
+                    <span class="title-bar"></span>
+                    <span>基金列表</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-default btn-sm" onclick="loadFunds()">🔄 刷新</button>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-gradient" onclick="showCreateFundModal()">
+                        ➕ 新建基金
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索基金名称或代码..." onkeyup="handleSearch(event)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 基金列表表格 -->
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:140px">基金代码</th>
+                            <th>基金名称</th>
+                            <th style="width:160px">创建时间</th>
+                            <th style="width:160px">更新时间</th>
+                            <th style="width:240px; text-align:right">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fundTableBody">
+                        <tr><td colspan="5" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 新建/编辑基金模态框 -->
+    <div class="modal-overlay" id="fundModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="fundModalTitle">新建基金</h2>
+                <button class="modal-close" onclick="closeFundModal()" aria-label="关闭">&times;</button>
+            </div>
+            <form id="fundForm">
+                <input type="hidden" id="fundId">
+                <div class="form-group">
+                    <label class="form-label">基金代码 <span class="req">*</span></label>
+                    <input type="text" id="fundCode" placeholder="请输入基金代码，如 HH001" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">基金名称 <span class="req">*</span></label>
+                    <input type="text" id="fundName" placeholder="请输入基金名称" required>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeFundModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveFund()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">⚠️ 确认删除</h2>
+                <button class="modal-close" onclick="closeDeleteModal()" aria-label="关闭">&times;</button>
+            </div>
+            <p id="deleteMessage" style="color:var(--text-2)">确定要删除这个基金吗？此操作不可恢复。</p>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        // 页面加载完成后获取基金列表
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFunds();
+            loadHeaderStats();
+        });
+    </script>
+</body>
+</html>
