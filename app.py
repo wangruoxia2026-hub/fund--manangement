@@ -15,7 +15,7 @@ from flask import Flask, request, jsonify, g, send_from_directory, render_templa
 from werkzeug.utils import secure_filename
 
 # DeepSeek API 配置
-DEEPSEEK_API_KEY = "sk-526e6d39be824a1982f935024f78e2b7"
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', '')
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # Flask 应用配置
